@@ -13,13 +13,11 @@
 </head>
 <body class="bg-gray-50 min-h-screen py-8">
     <div class="container mx-auto px-4 max-w-6xl">
-        <!-- Header -->
         <div class="text-center mb-8">
             <h1 class="text-4xl font-bold text-gray-800 mb-2">URL Analyzer & Encoder</h1>
             <p class="text-gray-600">Parse, decode, and edit URL components in real-time</p>
         </div>
 
-        <!-- Input Section -->
         <div class="bg-white rounded-lg shadow-md p-6 mb-6">
             <label for="urlInput" class="block text-lg font-semibold text-gray-700 mb-3">
                 Enter URL to Analyze
@@ -31,7 +29,6 @@
                 placeholder="https://example.com/path?name=John%20Doe&age=25&city=New%20York"
             ></textarea>
             <div id="errorMessage" class="hidden mt-3 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
-                <!-- Error messages will appear here -->
             </div>
             <div class="mt-3 flex gap-3">
                 <button 
@@ -49,7 +46,6 @@
             </div>
         </div>
 
-        <!-- URL Components Section -->
         <div id="componentsSection" class="hidden">
             <div class="bg-white rounded-lg shadow-md p-6 mb-6">
                 <h2 class="text-2xl font-bold text-gray-800 mb-4">URL Components</h2>
@@ -77,7 +73,6 @@
                 </div>
             </div>
 
-            <!-- Query Parameters Section -->
             <div class="bg-white rounded-lg shadow-md p-6 mb-6">
                 <div class="flex items-center justify-between mb-4">
                     <h2 class="text-2xl font-bold text-gray-800">Query Parameters</h2>
@@ -89,14 +84,12 @@
                     </button>
                 </div>
                 <div id="parametersContainer" class="space-y-2">
-                    <!-- Parameters will be inserted here -->
                 </div>
                 <div id="noParams" class="text-gray-500 italic text-center py-4 hidden">
                     No query parameters found
                 </div>
             </div>
 
-            <!-- Decoded/Encoded Toggle and Output -->
             <div class="bg-white rounded-lg shadow-md p-6">
                 <div class="flex items-center justify-between mb-4">
                     <h2 class="text-2xl font-bold text-gray-800">Reconstructed URL</h2>
@@ -120,7 +113,6 @@
     </div>
 
     <script>
-        // State management
         let urlComponents = {
             protocol: '',
             host: '',
@@ -130,7 +122,6 @@
             hash: ''
         };
 
-        // DOM elements
         const urlInput = document.getElementById('urlInput');
         const analyzeBtn = document.getElementById('analyzeBtn');
         const clearBtn = document.getElementById('clearBtn');
@@ -143,7 +134,6 @@
         const addParamBtn = document.getElementById('addParamBtn');
         const errorMessage = document.getElementById('errorMessage');
 
-        // Show error message
         function showError(message) {
             errorMessage.textContent = message;
             errorMessage.classList.remove('hidden');
@@ -152,12 +142,10 @@
             }, 5000);
         }
 
-        // Hide error message
         function hideError() {
             errorMessage.classList.add('hidden');
         }
 
-        // Parse URL function
         function parseURL(urlString) {
             try {
                 const url = new URL(urlString);
@@ -171,7 +159,6 @@
                     hash: url.hash
                 };
 
-                // Parse query parameters
                 url.searchParams.forEach((value, key) => {
                     urlComponents.params.push({
                         key: key,
@@ -187,7 +174,6 @@
             }
         }
 
-        // Display URL components
         function displayComponents() {
             document.getElementById('protocol').textContent = urlComponents.protocol || '-';
             document.getElementById('host').textContent = urlComponents.host || '-';
@@ -196,7 +182,6 @@
             document.getElementById('hash').textContent = urlComponents.hash || '-';
         }
 
-        // Display parameters
         function displayParameters() {
             parametersContainer.innerHTML = '';
             
@@ -212,7 +197,6 @@
             }
         }
 
-        // Create parameter row
         function createParameterRow(param, index) {
             const row = document.createElement('div');
             row.className = 'param-row flex gap-3 items-start p-3 border border-gray-200 rounded-lg';
@@ -249,7 +233,6 @@
                 </button>
             `;
 
-            // Add event listeners for inputs
             const keyInput = row.querySelector('.param-key');
             const valueInput = row.querySelector('.param-value');
             
@@ -261,12 +244,10 @@
             valueInput.addEventListener('input', (e) => {
                 urlComponents.params[index].value = e.target.value;
                 urlComponents.params[index].encoded = encodeURIComponent(e.target.value);
-                // Update encoded display
                 row.querySelector('.text-xs span').textContent = urlComponents.params[index].encoded;
                 updateOutput();
             });
 
-            // Delete button
             const deleteBtn = row.querySelector('.delete-param');
             deleteBtn.addEventListener('click', () => {
                 urlComponents.params.splice(index, 1);
@@ -277,7 +258,6 @@
             return row;
         }
 
-        // Add new parameter
         addParamBtn.addEventListener('click', () => {
             urlComponents.params.push({
                 key: '',
@@ -288,11 +268,9 @@
             updateOutput();
         });
 
-        // Update output URL
         function updateOutput() {
             let url = '';
             
-            // Build URL
             if (urlComponents.protocol) {
                 url += urlComponents.protocol + '//';
             }
@@ -305,10 +283,9 @@
             
             url += urlComponents.path || '/';
             
-            // Add query parameters
             if (urlComponents.params.length > 0) {
                 const queryString = urlComponents.params
-                    .filter(p => p.key) // Only include params with keys
+                    .filter(p => p.key)
                     .map(p => `${encodeURIComponent(p.key)}=${encodeURIComponent(p.value)}`)
                     .join('&');
                 
@@ -324,7 +301,6 @@
             outputUrl.textContent = url;
         }
 
-        // Escape HTML
         function escapeHtml(text) {
             const map = {
                 '&': '&amp;',
@@ -336,7 +312,6 @@
             return text.replace(/[&<>"']/g, m => map[m]);
         }
 
-        // Analyze button handler
         analyzeBtn.addEventListener('click', () => {
             const url = urlInput.value.trim();
             
@@ -354,7 +329,6 @@
             }
         });
 
-        // Clear button handler
         clearBtn.addEventListener('click', () => {
             urlInput.value = '';
             componentsSection.classList.add('hidden');
@@ -369,11 +343,9 @@
             };
         });
 
-        // Copy button handler
         copyBtn.addEventListener('click', () => {
             const url = outputUrl.textContent;
             
-            // Try modern clipboard API first
             if (navigator.clipboard && navigator.clipboard.writeText) {
                 navigator.clipboard.writeText(url).then(() => {
                     copyFeedback.classList.remove('hidden');
@@ -381,16 +353,13 @@
                         copyFeedback.classList.add('hidden');
                     }, 2000);
                 }).catch(err => {
-                    // Fallback to textarea method
                     fallbackCopy(url);
                 });
             } else {
-                // Use fallback method for older browsers
                 fallbackCopy(url);
             }
         });
 
-        // Fallback copy method
         function fallbackCopy(text) {
             const textarea = document.createElement('textarea');
             textarea.value = text;
@@ -410,7 +379,6 @@
             document.body.removeChild(textarea);
         }
 
-        // Allow Enter key to analyze
         urlInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter' && !e.shiftKey) {
                 e.preventDefault();
@@ -418,7 +386,6 @@
             }
         });
 
-        // Load example URL on page load
         window.addEventListener('load', () => {
             const exampleUrl = 'https://example.com/search?q=Hello%20World&category=tech&page=1&sort=date#results';
             urlInput.value = exampleUrl;
