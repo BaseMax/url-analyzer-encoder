@@ -30,6 +30,9 @@
                 rows="3"
                 placeholder="https://example.com/path?name=John%20Doe&age=25&city=New%20York"
             ></textarea>
+            <div id="errorMessage" class="hidden mt-3 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
+                <!-- Error messages will appear here -->
+            </div>
             <div class="mt-3 flex gap-3">
                 <button 
                     id="analyzeBtn"
@@ -138,6 +141,21 @@
         const copyBtn = document.getElementById('copyBtn');
         const copyFeedback = document.getElementById('copyFeedback');
         const addParamBtn = document.getElementById('addParamBtn');
+        const errorMessage = document.getElementById('errorMessage');
+
+        // Show error message
+        function showError(message) {
+            errorMessage.textContent = message;
+            errorMessage.classList.remove('hidden');
+            setTimeout(() => {
+                errorMessage.classList.add('hidden');
+            }, 5000);
+        }
+
+        // Hide error message
+        function hideError() {
+            errorMessage.classList.add('hidden');
+        }
 
         // Parse URL function
         function parseURL(urlString) {
@@ -164,7 +182,7 @@
 
                 return true;
             } catch (error) {
-                alert('Invalid URL format. Please enter a valid URL.');
+                showError('Invalid URL format. Please enter a valid URL (e.g., https://example.com)');
                 return false;
             }
         }
@@ -323,10 +341,11 @@
             const url = urlInput.value.trim();
             
             if (!url) {
-                alert('Please enter a URL');
+                showError('Please enter a URL to analyze');
                 return;
             }
 
+            hideError();
             if (parseURL(url)) {
                 displayComponents();
                 displayParameters();
@@ -339,6 +358,7 @@
         clearBtn.addEventListener('click', () => {
             urlInput.value = '';
             componentsSection.classList.add('hidden');
+            hideError();
             urlComponents = {
                 protocol: '',
                 host: '',
@@ -352,13 +372,43 @@
         // Copy button handler
         copyBtn.addEventListener('click', () => {
             const url = outputUrl.textContent;
-            navigator.clipboard.writeText(url).then(() => {
+            
+            // Try modern clipboard API first
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(url).then(() => {
+                    copyFeedback.classList.remove('hidden');
+                    setTimeout(() => {
+                        copyFeedback.classList.add('hidden');
+                    }, 2000);
+                }).catch(err => {
+                    // Fallback to textarea method
+                    fallbackCopy(url);
+                });
+            } else {
+                // Use fallback method for older browsers
+                fallbackCopy(url);
+            }
+        });
+
+        // Fallback copy method
+        function fallbackCopy(text) {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            textarea.style.position = 'fixed';
+            textarea.style.opacity = '0';
+            document.body.appendChild(textarea);
+            textarea.select();
+            try {
+                document.execCommand('copy');
                 copyFeedback.classList.remove('hidden');
                 setTimeout(() => {
                     copyFeedback.classList.add('hidden');
                 }, 2000);
-            });
-        });
+            } catch (err) {
+                showError('Failed to copy URL. Please copy manually.');
+            }
+            document.body.removeChild(textarea);
+        }
 
         // Allow Enter key to analyze
         urlInput.addEventListener('keypress', (e) => {
