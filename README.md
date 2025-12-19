@@ -2,6 +2,8 @@
 
 A powerful web-based utility for parsing, analyzing, and editing URLs with real-time encoding/decoding capabilities.
 
+![URL Analyzer & Encoder](preview.jpg)
+
 ## Features
 
 - 🔍 **URL Parsing**: Break down URLs into their components (protocol, host, port, path, hash)
